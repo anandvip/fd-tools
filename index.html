@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Tools Dashboard</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --accent-color: #3b82f6;
+            --light-color: #f3f4f6;
+            --dark-color: #1f2937;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f8fafc;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        h1 {
+            margin-bottom: 10px;
+        }
+        
+        .header-subtitle {
+            color: #94a3b8;
+            font-weight: 400;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .card-header {
+            padding: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            position: relative;
+        }
+        
+        .card-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            opacity: 0.8;
+        }
+        
+        .card-body {
+            padding: 20px;
+            flex-grow: 1;
+        }
+        
+        .card-description {
+            margin-bottom: 20px;
+            color: #4b5563;
+        }
+        
+        .card-meta {
+            display: flex;
+            align-items: center;
+            margin-top: 15px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .tag {
+            display: inline-block;
+            background-color: #e5e7eb;
+            color: #4b5563;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-right: 8px;
+        }
+        
+        .card-actions {
+            display: flex;
+            justify-content: flex-end;
+            padding: 15px 20px;
+            background-color: #f9fafb;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-secondary {
+            background-color: white;
+            color: var(--dark-color);
+            border: 1px solid #d1d5db;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .btn i {
+            margin-right: 6px;
+        }
+        
+        .search-box {
+            position: relative;
+            margin-bottom: 24px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px;
+            padding-left: 40px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+        
+        .category-tabs {
+            display: flex;
+            margin-bottom: 24px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+        }
+        
+        .category-tab {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            margin-right: 12px;
+            background-color: white;
+            color: #4b5563;
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s;
+        }
+        
+        .category-tab:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .category-tab.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            width: 500px;
+            max-width: 90%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .close-button {
+            font-size: 24px;
+            cursor: pointer;
+            color: #9ca3af;
+        }
+        
+        .close-button:hover {
+            color: #1f2937;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #4b5563;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+        
+        .modal-footer {
+            margin-top: 25px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .modal-footer button {
+            margin-left: 10px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Dark mode toggle */
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        
+        /* Font Awesome icons (using CSS equivalent) */
+        .icon {
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            stroke-width: 0;
+            stroke: currentColor;
+            fill: currentColor;
+        }
+    </style>
+    <!-- Add FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div>
+                <h1>Financial Tools Dashboard</h1>
+                <p class="header-subtitle">Manage and access your financial calculators and tools</p>
+            </div>
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Search tools...">
+        </div>
+        
+        <div class="category-tabs">
+            <div class="category-tab active" data-category="all">All Tools</div>
+            <div class="category-tab" data-category="calculators">Calculators</div>
+            <div class="category-tab" data-category="simulators">Simulators</div>
+            <div class="category-tab" data-category="managers">Managers</div>
+            <div class="category-tab" data-category="banking">Banking</div>
+        </div>
+        
+        <div class="grid" id="toolsGrid">
+            <!-- Tools will be dynamically added here -->
+        </div>
+    </div>
+    
+    <!-- Add Tool Modal -->
+    <div id="addToolModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Tool</h2>
+                <span class="close-button">&times;</span>
+            </div>
+            <form id="addToolForm">
+                <div class="form-group">
+                    <label for="toolName">Tool Name</label>
+                    <input type="text" id="toolName" required>
+                </div>
+                <div class="form-group">
+                    <label for="toolDescription">Description</label>
+                    <textarea id="toolDescription" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="toolCategory">Category</label>
+                    <select id="toolCategory" required>
+                        <option value="calculators">Calculator</option>
+                        <option value="simulators">Simulator</option>
+                        <option value="managers">Manager</option>
+                        <option value="banking">Banking</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="toolUrl">URL or Repository</label>
+                    <input type="text" id="toolUrl" required>
+                </div>
+                <div class="form-group">
+                    <label for="toolIcon">Icon (Font Awesome class)</label>
+                    <input type="text" id="toolIcon" placeholder="e.g. fa-calculator" value="fa-calculator">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelAddTool">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Tool</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // Initial tool data based on the repositories shown in image
+        const toolsData = [
+            {
+                id: 1,
+                name: "FD Compounding Calculator",
+                description: "Calculate the maturity amount of your fixed deposits with different compounding frequencies.",
+                category: "calculators",
+                url: "https://anandvip.github.io/fd-compounding/",
+                icon: "fa-chart-line",
+                tags: ["FD", "interest", "calculator"]
+            },
+            {
+                id: 2,
+                name: "Simulate Fixed Deposits",
+                description: "Simulate and compare different fixed deposit scenarios to find the best investment strategy.",
+                category: "simulators",
+                url: "https://anandvip.github.io/simulate-fd/",
+                icon: "fa-chart-pie",
+                tags: ["simulation", "FD", "comparison"]
+            },
+            {
+                id: 3,
+                name: "Value Added FD Calculator",
+                description: "Advanced calculator for fixed deposits with additional features like tax implications.",
+                category: "calculators",
+                url: "https://anandvip.github.io/va-fd-calc/",
+                icon: "fa-calculator",
+                tags: ["FD", "tax", "advanced"]
+            },
+            {
+                id: 4,
+                name: "FD Calculator",
+                description: "Simple fixed deposit calculator to compute maturity amount and interest earned.",
+                category: "calculators",
+                url: "https://anandvip.github.io/fd-calc/",
+                icon: "fa-calculator",
+                tags: ["basic", "FD", "calculator"]
+            },
+            {
+                id: 5,
+                name: "FD Calc Advanced",
+                description: "Comprehensive FD calculator with advanced features and detailed breakdowns.",
+                category: "calculators",
+                url: "https://anandvip.github.io/fdcalc/",
+                icon: "fa-calculator",
+                tags: ["FD", "advanced", "detailed"]
+            },
+            {
+                id: 6,
+                name: "FD Manager",
+                description: "Manage all your fixed deposits in one place, with reminders and maturity tracking.",
+                category: "managers",
+                url: "https://anandvip.github.io/fd-manager/",
+                icon: "fa-tasks",
+                tags: ["manager", "tracking", "FD"]
+            },
+            {
+                id: 7,
+                name: "Bank TDSFD Tool",
+                description: "Calculate TDS on fixed deposits for various banks with tax exemption options.",
+                category: "banking",
+                url: "https://anandvip.github.io/bank-tdsfd/",
+                icon: "fa-university",
+                tags: ["TDS", "tax", "banking"]
+            }
+        ];
+        
+        // Initialize app state
+        let appState = {
+            tools: [],
+            filteredTools: [],
+            currentCategory: 'all',
+            searchTerm: ''
+        };
+        
+        // DOM Elements
+        const toolsGrid = document.getElementById('toolsGrid');
+        const searchInput = document.getElementById('searchInput');
+        const categoryTabs = document.querySelectorAll('.category-tab');
+        const addToolModal = document.getElementById('addToolModal');
+        const addToolForm = document.getElementById('addToolForm');
+        const cancelAddToolBtn = document.getElementById('cancelAddTool');
+        const themeToggleBtn = document.getElementById('themeToggle');
+        
+        // Load tools data from localStorage or use initial data
+        function loadTools() {
+            const storedTools = localStorage.getItem('financialTools');
+            if (storedTools) {
+                appState.tools = JSON.parse(storedTools);
+            } else {
+                appState.tools = [...toolsData];
+                saveTools();
+            }
+            filterTools();
+        }
+        
+        // Save tools to localStorage
+        function saveTools() {
+            localStorage.setItem('financialTools', JSON.stringify(appState.tools));
+        }
+        
+        // Filter tools based on category and search term
+        function filterTools() {
+            let filtered = [...appState.tools];
+            
+            // Apply category filter
+            if (appState.currentCategory !== 'all') {
+                filtered = filtered.filter(tool => tool.category === appState.currentCategory);
+            }
+            
+            // Apply search filter
+            if (appState.searchTerm) {
+                const searchLower = appState.searchTerm.toLowerCase();
+                filtered = filtered.filter(tool => 
+                    tool.name.toLowerCase().includes(searchLower) || 
+                    tool.description.toLowerCase().includes(searchLower) ||
+                    tool.tags.some(tag => tag.toLowerCase().includes(searchLower))
+                );
+            }
+            
+            appState.filteredTools = filtered;
+            renderTools();
+        }
+        
+        // Render tools grid
+        function renderTools() {
+            toolsGrid.innerHTML = '';
+            
+            if (appState.filteredTools.length === 0) {
+                toolsGrid.innerHTML = `
+                    <div class="no-results" style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                        <i class="fas fa-search" style="font-size: 48px; color: #d1d5db; margin-bottom: 20px;"></i>
+                        <h3>No tools found</h3>
+                        <p>Try changing your search or category filter</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            appState.filteredTools.forEach(tool => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                
+                // Create tags HTML
+                const tagsHtml = tool.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
+                
+                card.innerHTML = `
+                    <div class="card-header">
+                        <h3>${tool.name}</h3>
+                        <div class="card-icon">
+                            <i class="fas ${tool.icon}"></i>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">${tool.description}</p>
+                        <div class="card-meta">
+                            ${tagsHtml}
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <a href="#" class="btn btn-secondary" data-tool-id="${tool.id}">
+                            <i class="fas fa-info-circle"></i> Details
+                        </a>
+                        <a href="#" class="btn btn-primary" data-tool-id="${tool.id}">
+                            <i class="fas fa-external-link-alt"></i> Open
+                        </a>
+                    </div>
+                `;
+                
+                toolsGrid.appendChild(card);
+            });
+            
+            // Add event listeners to the buttons
+            document.querySelectorAll('.card-actions .btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const toolId = parseInt(btn.dataset.toolId);
+                    const tool = appState.tools.find(t => t.id === toolId);
+                    
+                    if (btn.classList.contains('btn-primary')) {
+                        // Open tool in a new tab
+                        window.open(tool.url, '_blank');
+                    } else {
+                        // Show details
+                        alert(`Tool: ${tool.name}\nCategory: ${tool.category}\nURL: ${tool.url}`);
+                    }
+                });
+            });
+        }
+        
+        // Show add tool modal
+        function showAddToolModal() {
+            addToolForm.reset();
+            addToolModal.style.display = 'flex';
+        }
+        
+        // Close modal
+        function closeModal() {
+            addToolModal.style.display = 'none';
+        }
+        
+        // Add new tool
+        function addNewTool(e) {
+            e.preventDefault();
+            
+            const newTool = {
+                id: Math.max(0, ...appState.tools.map(tool => tool.id)) + 1,
+                name: document.getElementById('toolName').value.trim(),
+                description: document.getElementById('toolDescription').value.trim(),
+                category: document.getElementById('toolCategory').value,
+                url: document.getElementById('toolUrl').value.trim(),
+                icon: document.getElementById('toolIcon').value.trim(),
+                tags: document.getElementById('toolName').value.trim().split(' ').map(word => word.toLowerCase())
+            };
+            
+            appState.tools.push(newTool);
+            saveTools();
+            closeModal();
+            filterTools();
+        }
+        
+        // Toggle dark/light theme
+        function toggleTheme() {
+            const body = document.body;
+            body.classList.toggle('dark-mode');
+            
+            if (body.classList.contains('dark-mode')) {
+                themeToggleBtn.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                themeToggleBtn.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+        }
+        
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize
+            loadTools();
+            
+            // Search functionality
+            searchInput.addEventListener('input', () => {
+                appState.searchTerm = searchInput.value;
+                filterTools();
+            });
+            
+            // Category tabs
+            categoryTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    categoryTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    appState.currentCategory = tab.dataset.category;
+                    filterTools();
+                });
+            });
+            
+            // Modal close events
+            document.querySelectorAll('.close-button').forEach(btn => {
+                btn.addEventListener('click', closeModal);
+            });
+            
+            cancelAddToolBtn.addEventListener('click', closeModal);
+            
+            window.addEventListener('click', (e) => {
+                if (e.target === addToolModal) {
+                    closeModal();
+                }
+            });
+            
+            // Add tool form submission
+            addToolForm.addEventListener('submit', addNewTool);
+            
+            // Theme toggle
+            themeToggleBtn.addEventListener('click', toggleTheme);
+            
+            // Add floating action button for adding new tool
+            const fab = document.createElement('button');
+            fab.className = 'btn btn-primary';
+            fab.style.position = 'fixed';
+            fab.style.bottom = '30px';
+            fab.style.right = '30px';
+            fab.style.borderRadius = '50%';
+            fab.style.width = '60px';
+            fab.style.height = '60px';
+            fab.style.boxShadow = '0 4px 10px rgba(0,0,0,0.2)';
+            fab.style.zIndex = '900';
+            fab.innerHTML = '<i class="fas fa-plus" style="margin: 0;"></i>';
+            fab.addEventListener('click', showAddToolModal);
+            document.body.appendChild(fab);
+        });
+    </script>
+</body>
+</html>
