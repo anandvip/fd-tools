@@ -365,14 +365,15 @@
         </div>
     </div>
     
-    <!-- Add Tool Modal -->
-    <div id="addToolModal" class="modal">
+    <!-- Add/Edit Tool Modal -->
+    <div id="toolModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Add New Tool</h2>
+                <h2 id="modalTitle">Add New Tool</h2>
                 <span class="close-button">&times;</span>
             </div>
-            <form id="addToolForm">
+            <form id="toolForm">
+                <input type="hidden" id="toolId">
                 <div class="form-group">
                     <label for="toolName">Tool Name</label>
                     <input type="text" id="toolName" required>
@@ -391,16 +392,20 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="toolUrl">URL or Repository</label>
-                    <input type="text" id="toolUrl" required>
+                    <label for="toolUrl">URL (GitHub Pages)</label>
+                    <input type="text" id="toolUrl" required placeholder="https://anandvip.github.io/repo-name/">
                 </div>
                 <div class="form-group">
                     <label for="toolIcon">Icon (Font Awesome class)</label>
                     <input type="text" id="toolIcon" placeholder="e.g. fa-calculator" value="fa-calculator">
                 </div>
+                <div class="form-group">
+                    <label for="toolTags">Tags (comma separated)</label>
+                    <input type="text" id="toolTags" placeholder="e.g. FD, calculator, interest">
+                </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" id="cancelAddTool">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Add Tool</button>
+                    <button type="button" class="btn btn-secondary" id="cancelToolBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveToolBtn">Save</button>
                 </div>
             </form>
         </div>
@@ -447,12 +452,12 @@
             },
             {
                 id: 5,
-                name: "Sriram FD Calc",
+                name: "FD Calc Advanced",
                 description: "Comprehensive FD calculator with advanced features and detailed breakdowns.",
                 category: "calculators",
                 url: "https://anandvip.github.io/fdcalc/",
                 icon: "fa-calculator",
-                tags: ["FD", "advanced", "Sriram", "calculator"]
+                tags: ["FD", "advanced", "detailed"]
             },
             {
                 id: 6,
@@ -486,9 +491,17 @@
         const toolsGrid = document.getElementById('toolsGrid');
         const searchInput = document.getElementById('searchInput');
         const categoryTabs = document.querySelectorAll('.category-tab');
-        const addToolModal = document.getElementById('addToolModal');
-        const addToolForm = document.getElementById('addToolForm');
-        const cancelAddToolBtn = document.getElementById('cancelAddTool');
+        const toolModal = document.getElementById('toolModal');
+        const toolForm = document.getElementById('toolForm');
+        const toolIdInput = document.getElementById('toolId');
+        const toolNameInput = document.getElementById('toolName');
+        const toolDescriptionInput = document.getElementById('toolDescription');
+        const toolCategoryInput = document.getElementById('toolCategory');
+        const toolUrlInput = document.getElementById('toolUrl');
+        const toolIconInput = document.getElementById('toolIcon');
+        const toolTagsInput = document.getElementById('toolTags');
+        const modalTitle = document.getElementById('modalTitle');
+        const cancelToolBtn = document.getElementById('cancelToolBtn');
         const themeToggleBtn = document.getElementById('themeToggle');
         
         // Load tools data from localStorage or use initial data
@@ -567,10 +580,10 @@
                         </div>
                     </div>
                     <div class="card-actions">
-                        <a href="#" class="btn btn-secondary" data-tool-id="${tool.id}">
-                            <i class="fas fa-info-circle"></i> Details
-                        </a>
-                        <a href="#" class="btn btn-primary" data-tool-id="${tool.id}">
+                        <button class="btn btn-secondary edit-tool-btn" data-tool-id="${tool.id}">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <a href="${tool.url}" class="btn btn-primary" target="_blank">
                             <i class="fas fa-external-link-alt"></i> Open
                         </a>
                     </div>
@@ -579,50 +592,81 @@
                 toolsGrid.appendChild(card);
             });
             
-            // Add event listeners to the buttons
-            document.querySelectorAll('.card-actions .btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.preventDefault();
+            // Add edit button event listeners
+            document.querySelectorAll('.edit-tool-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
                     const toolId = parseInt(btn.dataset.toolId);
-                    const tool = appState.tools.find(t => t.id === toolId);
-                    
-                    if (btn.classList.contains('btn-primary')) {
-                        // Open tool in a new tab
-                        window.open(tool.url, '_blank');
-                    } else {
-                        // Show details
-                        alert(`Tool: ${tool.name}\nCategory: ${tool.category}\nURL: ${tool.url}`);
-                    }
+                    openEditToolModal(toolId);
                 });
             });
         }
         
         // Show add tool modal
         function showAddToolModal() {
-            addToolForm.reset();
-            addToolModal.style.display = 'flex';
+            toolForm.reset();
+            toolIdInput.value = '';
+            modalTitle.textContent = 'Add New Tool';
+            toolModal.style.display = 'flex';
+        }
+        
+        // Show edit tool modal
+        function openEditToolModal(id) {
+            const tool = appState.tools.find(tool => tool.id === id);
+            if (!tool) return;
+            
+            toolForm.reset();
+            toolIdInput.value = tool.id;
+            toolNameInput.value = tool.name;
+            toolDescriptionInput.value = tool.description;
+            toolCategoryInput.value = tool.category;
+            toolUrlInput.value = tool.url;
+            toolIconInput.value = tool.icon;
+            toolTagsInput.value = tool.tags.join(', ');
+            
+            modalTitle.textContent = 'Edit Tool';
+            toolModal.style.display = 'flex';
         }
         
         // Close modal
         function closeModal() {
-            addToolModal.style.display = 'none';
+            toolModal.style.display = 'none';
         }
         
-        // Add new tool
-        function addNewTool(e) {
+        // Save tool (add new or update existing)
+        function saveTool(e) {
             e.preventDefault();
             
-            const newTool = {
-                id: Math.max(0, ...appState.tools.map(tool => tool.id)) + 1,
-                name: document.getElementById('toolName').value.trim(),
-                description: document.getElementById('toolDescription').value.trim(),
-                category: document.getElementById('toolCategory').value,
-                url: document.getElementById('toolUrl').value.trim(),
-                icon: document.getElementById('toolIcon').value.trim(),
-                tags: document.getElementById('toolName').value.trim().split(' ').map(word => word.toLowerCase())
+            const formToolId = toolIdInput.value.trim();
+            const toolData = {
+                name: toolNameInput.value.trim(),
+                description: toolDescriptionInput.value.trim(),
+                category: toolCategoryInput.value,
+                url: toolUrlInput.value.trim(),
+                icon: toolIconInput.value.trim(),
+                tags: toolTagsInput.value.split(',').map(tag => tag.trim().toLowerCase()).filter(tag => tag !== '')
             };
             
-            appState.tools.push(newTool);
+            if (formToolId) {
+                // Update existing tool
+                const toolId = parseInt(formToolId);
+                const index = appState.tools.findIndex(tool => tool.id === toolId);
+                
+                if (index !== -1) {
+                    appState.tools[index] = {
+                        ...appState.tools[index],
+                        ...toolData
+                    };
+                }
+            } else {
+                // Add new tool
+                const newTool = {
+                    id: Math.max(0, ...appState.tools.map(tool => tool.id)) + 1,
+                    ...toolData
+                };
+                
+                appState.tools.push(newTool);
+            }
+            
             saveTools();
             closeModal();
             filterTools();
@@ -666,7 +710,7 @@
                 btn.addEventListener('click', closeModal);
             });
             
-            cancelAddToolBtn.addEventListener('click', closeModal);
+            // This line is no longer needed
             
             window.addEventListener('click', (e) => {
                 if (e.target === addToolModal) {
@@ -674,8 +718,20 @@
                 }
             });
             
-            // Add tool form submission
-            addToolForm.addEventListener('submit', addNewTool);
+            // Tool form events
+            toolForm.addEventListener('submit', saveTool);
+            cancelToolBtn.addEventListener('click', closeModal);
+            
+            // Modal close events
+            document.querySelectorAll('.close-button').forEach(btn => {
+                btn.addEventListener('click', closeModal);
+            });
+            
+            window.addEventListener('click', (e) => {
+                if (e.target === toolModal) {
+                    closeModal();
+                }
+            });
             
             // Theme toggle
             themeToggleBtn.addEventListener('click', toggleTheme);
