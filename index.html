@@ -4,16 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Financial Tools Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* CSS Variables for theming */
         :root {
+            /* Light theme (default) */
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1f2937;
+            --text-secondary: #4b5563;
+            --text-muted: #6b7280;
             --primary-color: #2563eb;
-            --secondary-color: #1e40af;
-            --accent-color: #3b82f6;
-            --light-color: #f3f4f6;
-            --dark-color: #1f2937;
+            --primary-hover: #1d4ed8;
+            --secondary-color: #f3f4f6;
+            --secondary-hover: #e5e7eb;
+            --header-bg: #1f2937;
+            --header-text: #ffffff;
             --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --border-color: #e5e7eb;
+            --tag-bg: #e5e7eb;
+            --tag-text: #4b5563;
+            --card-action-bg: #f9fafb;
+            --danger-color: #ef4444;
+            --danger-hover: #dc2626;
+            --search-border-focus: rgba(59, 130, 246, 0.3);
+        }
+
+        /* Dark theme */
+        .dark-mode {
+            --bg-color: #111827;
+            --card-bg: #1f2937;
+            --text-color: #f9fafb;
+            --text-secondary: #d1d5db;
+            --text-muted: #9ca3af;
+            --primary-color: #3b82f6;
+            --primary-hover: #2563eb;
+            --secondary-color: #374151;
+            --secondary-hover: #4b5563;
+            --header-bg: #030712;
+            --header-text: #f9fafb;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+            --border-color: #374151;
+            --tag-bg: #374151;
+            --tag-text: #d1d5db;
+            --card-action-bg: #1a2234;
+            --danger-color: #f87171;
+            --danger-hover: #ef4444;
+            --search-border-focus: rgba(59, 130, 246, 0.5);
         }
         
+        /* Reset and Base Styles */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -22,9 +62,10 @@
         }
         
         body {
-            background-color: #f8fafc;
-            color: var(--dark-color);
+            background-color: var(--bg-color);
+            color: var(--text-color);
             line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
         
         .container {
@@ -33,11 +74,13 @@
             padding: 20px;
         }
         
+        /* Header Styles */
         header {
-            background-color: var(--dark-color);
-            color: white;
+            background-color: var(--header-bg);
+            color: var(--header-text);
             padding: 20px 0;
             margin-bottom: 30px;
+            transition: background-color 0.3s ease;
         }
         
         header .container {
@@ -51,22 +94,24 @@
         }
         
         .header-subtitle {
-            color: #94a3b8;
+            color: var(--text-muted);
             font-weight: 400;
         }
         
+        /* Grid Layout */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 24px;
         }
         
+        /* Card Styles */
         .card {
-            background-color: white;
+            background-color: var(--card-bg);
             border-radius: 8px;
             overflow: hidden;
             box-shadow: var(--card-shadow);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
             position: relative;
             display: flex;
             flex-direction: column;
@@ -82,6 +127,7 @@
             background-color: var(--primary-color);
             color: white;
             position: relative;
+            transition: background-color 0.3s ease;
         }
         
         .card-icon {
@@ -99,41 +145,46 @@
         
         .card-description {
             margin-bottom: 20px;
-            color: #4b5563;
+            color: var(--text-secondary);
         }
         
         .card-meta {
             display: flex;
             align-items: center;
             margin-top: 15px;
-            color: #6b7280;
+            color: var(--text-muted);
             font-size: 14px;
+            flex-wrap: wrap;
         }
         
         .tag {
             display: inline-block;
-            background-color: #e5e7eb;
-            color: #4b5563;
+            background-color: var(--tag-bg);
+            color: var(--tag-text);
             padding: 4px 8px;
             border-radius: 4px;
             font-size: 12px;
             margin-right: 8px;
+            margin-bottom: 4px;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
         
         .card-actions {
             display: flex;
             justify-content: flex-end;
             padding: 15px 20px;
-            background-color: #f9fafb;
-            border-top: 1px solid #e5e7eb;
+            background-color: var(--card-action-bg);
+            border-top: 1px solid var(--border-color);
+            transition: background-color 0.3s ease;
         }
         
+        /* Button Styles */
         .btn {
             padding: 8px 16px;
             border-radius: 6px;
             font-weight: 500;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
@@ -147,23 +198,33 @@
         }
         
         .btn-primary:hover {
-            background-color: var(--secondary-color);
+            background-color: var(--primary-hover);
         }
         
         .btn-secondary {
-            background-color: white;
-            color: var(--dark-color);
-            border: 1px solid #d1d5db;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
         }
         
         .btn-secondary:hover {
-            background-color: #f3f4f6;
+            background-color: var(--secondary-hover);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: var(--danger-hover);
         }
         
         .btn i {
             margin-right: 6px;
         }
         
+        /* Search Box */
         .search-box {
             position: relative;
             margin-bottom: 24px;
@@ -173,16 +234,18 @@
             width: 100%;
             padding: 12px 20px;
             padding-left: 40px;
-            border: 1px solid #d1d5db;
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             font-size: 16px;
-            transition: border-color 0.2s;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            transition: border-color 0.2s ease, background-color 0.3s ease, color 0.3s ease;
         }
         
         .search-box input:focus {
             outline: none;
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--search-border-focus);
         }
         
         .search-box i {
@@ -190,9 +253,11 @@
             left: 14px;
             top: 50%;
             transform: translateY(-50%);
-            color: #9ca3af;
+            color: var(--text-muted);
+            transition: color 0.3s ease;
         }
         
+        /* Category Tabs */
         .category-tabs {
             display: flex;
             margin-bottom: 24px;
@@ -207,14 +272,14 @@
             cursor: pointer;
             white-space: nowrap;
             margin-right: 12px;
-            background-color: white;
-            color: #4b5563;
-            border: 1px solid #e5e7eb;
-            transition: all 0.2s;
+            background-color: var(--card-bg);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
         }
         
         .category-tab:hover {
-            background-color: #f3f4f6;
+            background-color: var(--secondary-hover);
         }
         
         .category-tab.active {
@@ -223,7 +288,7 @@
             border-color: var(--primary-color);
         }
         
-        /* Modal styles */
+        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -238,12 +303,13 @@
         }
         
         .modal-content {
-            background-color: white;
+            background-color: var(--card-bg);
             padding: 25px;
             border-radius: 8px;
             width: 500px;
             max-width: 90%;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s ease;
         }
         
         .modal-header {
@@ -256,11 +322,12 @@
         .close-button {
             font-size: 24px;
             cursor: pointer;
-            color: #9ca3af;
+            color: var(--text-muted);
+            transition: color 0.3s ease;
         }
         
         .close-button:hover {
-            color: #1f2937;
+            color: var(--text-color);
         }
         
         .form-group {
@@ -271,21 +338,25 @@
             display: block;
             margin-bottom: 5px;
             font-weight: 500;
-            color: #4b5563;
+            color: var(--text-secondary);
+            transition: color 0.3s ease;
         }
         
         input, select, textarea {
             width: 100%;
             padding: 10px;
-            border: 1px solid #d1d5db;
+            border: 1px solid var(--border-color);
             border-radius: 6px;
             font-size: 14px;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            transition: border-color 0.2s ease, background-color 0.3s ease, color 0.3s ease, box-shadow 0.2s ease;
         }
         
         input:focus, select:focus, textarea:focus {
             outline: none;
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--search-border-focus);
         }
         
         .modal-footer {
@@ -298,7 +369,55 @@
             margin-left: 10px;
         }
         
-        /* Responsive */
+        /* Empty State */
+        .no-results {
+            grid-column: 1/-1;
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+        
+        /* Dark Mode Toggle */
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--header-text);
+            cursor: pointer;
+            font-size: 18px;
+            padding: 8px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease;
+        }
+        
+        .theme-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .fab i {
+            margin: 0;
+        }
+        
+        /* Responsive Styles */
         @media (max-width: 768px) {
             .grid {
                 grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -309,29 +428,19 @@
             .grid {
                 grid-template-columns: 1fr;
             }
-        }
-        
-        /* Dark mode toggle */
-        .theme-toggle {
-            background: none;
-            border: none;
-            color: white;
-            cursor: pointer;
-            font-size: 18px;
-        }
-        
-        /* Font Awesome icons (using CSS equivalent) */
-        .icon {
-            display: inline-block;
-            width: 1em;
-            height: 1em;
-            stroke-width: 0;
-            stroke: currentColor;
-            fill: currentColor;
+            
+            .header .container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .theme-toggle {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+            }
         }
     </style>
-    <!-- Add FontAwesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 </head>
 <body>
     <header>
@@ -340,7 +449,7 @@
                 <h1>Financial Tools Dashboard</h1>
                 <p class="header-subtitle">Manage and access your financial calculators and tools</p>
             </div>
-            <button class="theme-toggle" id="themeToggle">
+            <button class="theme-toggle" id="themeToggle" title="Toggle dark/light mode">
                 <i class="fas fa-moon"></i>
             </button>
         </div>
@@ -392,7 +501,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="toolUrl">URL (GitHub Pages)</label>
+                    <label for="toolUrl">URL</label>
                     <input type="text" id="toolUrl" required placeholder="https://anandvip.github.io/repo-name/">
                 </div>
                 <div class="form-group">
@@ -404,6 +513,9 @@
                     <input type="text" id="toolTags" placeholder="e.g. FD, calculator, interest">
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="deleteToolBtn" style="margin-right: auto; display: none;">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
                     <button type="button" class="btn btn-secondary" id="cancelToolBtn">Cancel</button>
                     <button type="submit" class="btn btn-primary" id="saveToolBtn">Save</button>
                 </div>
@@ -411,8 +523,12 @@
         </div>
     </div>
     
+    <button class="btn btn-primary fab" id="addToolBtn">
+        <i class="fas fa-plus"></i>
+    </button>
+    
     <script>
-        // Initial tool data based on the repositories shown in image
+        // Initial tool data
         const toolsData = [
             {
                 id: 1,
@@ -479,12 +595,13 @@
             }
         ];
         
-        // Initialize app state
-        let appState = {
+        // App state management
+        const appState = {
             tools: [],
             filteredTools: [],
             currentCategory: 'all',
-            searchTerm: ''
+            searchTerm: '',
+            darkMode: false
         };
         
         // DOM Elements
@@ -493,6 +610,7 @@
         const categoryTabs = document.querySelectorAll('.category-tab');
         const toolModal = document.getElementById('toolModal');
         const toolForm = document.getElementById('toolForm');
+        const modalTitle = document.getElementById('modalTitle');
         const toolIdInput = document.getElementById('toolId');
         const toolNameInput = document.getElementById('toolName');
         const toolDescriptionInput = document.getElementById('toolDescription');
@@ -500,25 +618,77 @@
         const toolUrlInput = document.getElementById('toolUrl');
         const toolIconInput = document.getElementById('toolIcon');
         const toolTagsInput = document.getElementById('toolTags');
-        const modalTitle = document.getElementById('modalTitle');
+        const deleteToolBtn = document.getElementById('deleteToolBtn');
         const cancelToolBtn = document.getElementById('cancelToolBtn');
         const themeToggleBtn = document.getElementById('themeToggle');
+        const addToolBtn = document.getElementById('addToolBtn');
+        const closeModalBtn = document.querySelector('.close-button');
         
-        // Load tools data from localStorage or use initial data
+        // Load tools from localStorage or use initial data
         function loadTools() {
-            const storedTools = localStorage.getItem('financialTools');
-            if (storedTools) {
-                appState.tools = JSON.parse(storedTools);
-            } else {
+            try {
+                const storedTools = localStorage.getItem('financialTools');
+                if (storedTools) {
+                    appState.tools = JSON.parse(storedTools);
+                } else {
+                    appState.tools = [...toolsData];
+                    saveTools();
+                }
+            } catch (error) {
+                console.error('Error loading tools:', error);
                 appState.tools = [...toolsData];
-                saveTools();
             }
             filterTools();
         }
         
+        // Load theme preference from localStorage
+        function loadThemePreference() {
+            try {
+                const savedMode = localStorage.getItem('darkMode');
+                if (savedMode !== null) {
+                    appState.darkMode = savedMode === 'true';
+                    applyTheme();
+                }
+            } catch (error) {
+                console.error('Error loading theme preference:', error);
+            }
+        }
+        
         // Save tools to localStorage
         function saveTools() {
-            localStorage.setItem('financialTools', JSON.stringify(appState.tools));
+            try {
+                localStorage.setItem('financialTools', JSON.stringify(appState.tools));
+            } catch (error) {
+                console.error('Error saving tools:', error);
+                alert('Unable to save your changes. Your browser might have storage restrictions enabled.');
+            }
+        }
+        
+        // Save theme preference to localStorage
+        function saveThemePreference() {
+            try {
+                localStorage.setItem('darkMode', appState.darkMode);
+            } catch (error) {
+                console.error('Error saving theme preference:', error);
+            }
+        }
+        
+        // Apply the current theme
+        function applyTheme() {
+            if (appState.darkMode) {
+                document.body.classList.add('dark-mode');
+                themeToggleBtn.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                document.body.classList.remove('dark-mode');
+                themeToggleBtn.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+        }
+        
+        // Toggle theme
+        function toggleTheme() {
+            appState.darkMode = !appState.darkMode;
+            applyTheme();
+            saveThemePreference();
         }
         
         // Filter tools based on category and search term
@@ -536,7 +706,7 @@
                 filtered = filtered.filter(tool => 
                     tool.name.toLowerCase().includes(searchLower) || 
                     tool.description.toLowerCase().includes(searchLower) ||
-                    tool.tags.some(tag => tag.toLowerCase().includes(searchLower))
+                    (Array.isArray(tool.tags) && tool.tags.some(tag => tag.toLowerCase().includes(searchLower)))
                 );
             }
             
@@ -550,8 +720,8 @@
             
             if (appState.filteredTools.length === 0) {
                 toolsGrid.innerHTML = `
-                    <div class="no-results" style="grid-column: 1/-1; text-align: center; padding: 40px;">
-                        <i class="fas fa-search" style="font-size: 48px; color: #d1d5db; margin-bottom: 20px;"></i>
+                    <div class="no-results">
+                        <i class="fas fa-search" style="font-size: 48px; margin-bottom: 20px;"></i>
                         <h3>No tools found</h3>
                         <p>Try changing your search or category filter</p>
                     </div>
@@ -564,7 +734,9 @@
                 card.className = 'card';
                 
                 // Create tags HTML
-                const tagsHtml = tool.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
+                const tagsHtml = Array.isArray(tool.tags) && tool.tags.length > 0 
+                    ? tool.tags.map(tag => `<span class="tag">${tag}</span>`).join('') 
+                    : '';
                 
                 card.innerHTML = `
                     <div class="card-header">
@@ -606,6 +778,7 @@
             toolForm.reset();
             toolIdInput.value = '';
             modalTitle.textContent = 'Add New Tool';
+            deleteToolBtn.style.display = 'none';
             toolModal.style.display = 'flex';
         }
         
@@ -620,10 +793,16 @@
             toolDescriptionInput.value = tool.description;
             toolCategoryInput.value = tool.category;
             toolUrlInput.value = tool.url;
-            toolIconInput.value = tool.icon;
-            toolTagsInput.value = tool.tags.join(', ');
+            toolIconInput.value = tool.icon || 'fa-calculator';
+            
+            if (Array.isArray(tool.tags)) {
+                toolTagsInput.value = tool.tags.join(', ');
+            } else {
+                toolTagsInput.value = '';
+            }
             
             modalTitle.textContent = 'Edit Tool';
+            deleteToolBtn.style.display = 'block';
             toolModal.style.display = 'flex';
         }
         
@@ -632,18 +811,59 @@
             toolModal.style.display = 'none';
         }
         
+        // Delete a tool
+        function deleteTool() {
+            const toolId = parseInt(toolIdInput.value);
+            if (isNaN(toolId)) return;
+            
+            if (confirm('Are you sure you want to delete this tool?')) {
+                appState.tools = appState.tools.filter(tool => tool.id !== toolId);
+                saveTools();
+                closeModal();
+                filterTools();
+            }
+        }
+        
+        // Validate URL format
+        function isValidUrl(url) {
+            try {
+                new URL(url);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+        
         // Save tool (add new or update existing)
         function saveTool(e) {
             e.preventDefault();
             
             const formToolId = toolIdInput.value.trim();
+            const name = toolNameInput.value.trim();
+            const url = toolUrlInput.value.trim();
+            
+            // Validate URL
+            if (!isValidUrl(url)) {
+                alert('Please enter a valid URL (e.g., https://anandvip.github.io/repo-name/)');
+                toolUrlInput.focus();
+                return;
+            }
+            
+            // Process tags
+            let tags = [];
+            if (toolTagsInput.value.trim()) {
+                tags = toolTagsInput.value.split(',')
+                    .map(tag => tag.trim())
+                    .filter(tag => tag !== '');
+            }
+            
             const toolData = {
-                name: toolNameInput.value.trim(),
+                name: name,
                 description: toolDescriptionInput.value.trim(),
                 category: toolCategoryInput.value,
-                url: toolUrlInput.value.trim(),
-                icon: toolIconInput.value.trim(),
-                tags: toolTagsInput.value.split(',').map(tag => tag.trim().toLowerCase()).filter(tag => tag !== '')
+                url: url,
+                icon: toolIconInput.value.trim() || 'fa-calculator',
+                tags: tags
             };
             
             if (formToolId) {
@@ -660,7 +880,7 @@
             } else {
                 // Add new tool
                 const newTool = {
-                    id: Math.max(0, ...appState.tools.map(tool => tool.id)) + 1,
+                    id: appState.tools.length > 0 ? Math.max(...appState.tools.map(tool => tool.id)) + 1 : 1,
                     ...toolData
                 };
                 
@@ -672,22 +892,11 @@
             filterTools();
         }
         
-        // Toggle dark/light theme
-        function toggleTheme() {
-            const body = document.body;
-            body.classList.toggle('dark-mode');
-            
-            if (body.classList.contains('dark-mode')) {
-                themeToggleBtn.innerHTML = '<i class="fas fa-sun"></i>';
-            } else {
-                themeToggleBtn.innerHTML = '<i class="fas fa-moon"></i>';
-            }
-        }
-        
-        // Event Listeners
+        // Event listeners
         document.addEventListener('DOMContentLoaded', () => {
             // Initialize
             loadTools();
+            loadThemePreference();
             
             // Search functionality
             searchInput.addEventListener('input', () => {
@@ -705,51 +914,26 @@
                 });
             });
             
-            // Modal close events
-            document.querySelectorAll('.close-button').forEach(btn => {
-                btn.addEventListener('click', closeModal);
-            });
+            // Theme toggle
+            themeToggleBtn.addEventListener('click', toggleTheme);
             
-            // This line is no longer needed
+            // Add tool button
+            addToolBtn.addEventListener('click', showAddToolModal);
             
-            window.addEventListener('click', (e) => {
-                if (e.target === addToolModal) {
-                    closeModal();
-                }
-            });
-            
-            // Tool form events
-            toolForm.addEventListener('submit', saveTool);
+            // Modal events
+            closeModalBtn.addEventListener('click', closeModal);
             cancelToolBtn.addEventListener('click', closeModal);
+            deleteToolBtn.addEventListener('click', deleteTool);
             
-            // Modal close events
-            document.querySelectorAll('.close-button').forEach(btn => {
-                btn.addEventListener('click', closeModal);
-            });
-            
-            window.addEventListener('click', (e) => {
+            // Close modal when clicking outside
+            toolModal.addEventListener('click', (e) => {
                 if (e.target === toolModal) {
                     closeModal();
                 }
             });
             
-            // Theme toggle
-            themeToggleBtn.addEventListener('click', toggleTheme);
-            
-            // Add floating action button for adding new tool
-            const fab = document.createElement('button');
-            fab.className = 'btn btn-primary';
-            fab.style.position = 'fixed';
-            fab.style.bottom = '30px';
-            fab.style.right = '30px';
-            fab.style.borderRadius = '50%';
-            fab.style.width = '60px';
-            fab.style.height = '60px';
-            fab.style.boxShadow = '0 4px 10px rgba(0,0,0,0.2)';
-            fab.style.zIndex = '900';
-            fab.innerHTML = '<i class="fas fa-plus" style="margin: 0;"></i>';
-            fab.addEventListener('click', showAddToolModal);
-            document.body.appendChild(fab);
+            // Form submission
+            toolForm.addEventListener('submit', saveTool);
         });
     </script>
 </body>
