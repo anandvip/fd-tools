@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Reality of Fixed Deposits</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #e74c3c;
+            --accent-color: #3498db;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--primary-color);
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--secondary-color);
+        }
+        
+        .calculator {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            display: block;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .results {
+            display: none;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .results h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .result-label {
+            font-weight: 600;
+        }
+        
+        .chart-container {
+            height: 350px;
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .bar {
+            display: inline-block;
+            width: 20%;
+            margin: 0 1%;
+            position: relative;
+            background-color: var(--accent-color);
+            border-radius: 5px 5px 0 0;
+            transition: height 1s ease-in-out;
+            bottom: 0;
+        }
+        
+        .bar-1 {
+            background-color: #3498db;
+        }
+        
+        .bar-2 {
+            background-color: #2ecc71;
+        }
+        
+        .bar-3 {
+            background-color: #e67e22;
+        }
+        
+        .bar-4 {
+            background-color: #e74c3c;
+        }
+        
+        .bar-label {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            bottom: -30px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .bar-value {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            top: -30px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        .chart-base {
+            height: 1px;
+            background-color: #333;
+            margin-top: 30px;
+        }
+        
+        .highlight {
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+        
+        .analysis {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid var(--secondary-color);
+        }
+        
+        .impact-statement {
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 20px;
+            color: var(--secondary-color);
+        }
+
+        .compounding-info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f4f8;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .inflation-explainer {
+            font-style: italic;
+            color: #555;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .bar {
+                width: 22%;
+                margin: 0 1.5%;
+            }
+            
+            .bar-label {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>The Reality of Fixed Deposits: What Banks Don't Tell You</h1>
+        
+        <div class="calculator">
+            <div class="form-group">
+                <label for="principal">Fixed Deposit Amount (₹)</label>
+                <input type="number" id="principal" value="500000" min="1000" step="1000">
+            </div>
+            
+            <div class="form-group">
+                <label for="interestRate">Bank's Advertised Interest Rate (%)</label>
+                <input type="number" id="interestRate" value="7.5" min="1" max="20" step="0.1">
+            </div>
+            
+            <div class="form-group">
+                <label for="duration">Duration (Years)</label>
+                <input type="number" id="duration" value="1" min="1" max="10" step="1">
+            </div>
+            
+            <div class="form-group">
+                <label for="compounding">Compounding Frequency</label>
+                <select id="compounding">
+                    <option value="1">Annually</option>
+                    <option value="2">Semi-Annually</option>
+                    <option value="4" selected>Quarterly</option>
+                    <option value="12">Monthly</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="inflation">Current Inflation Rate (%)</label>
+                <input type="number" id="inflation" value="5.2" min="0" max="20" step="0.1">
+            </div>
+            
+            <div class="form-group">
+                <label for="taxRate">TDS/Tax Rate (%)</label>
+                <input type="number" id="taxRate" value="10" min="0" max="40" step="0.1">
+            </div>
+            
+            <button id="calculate">Calculate Real Returns</button>
+        </div>
+        
+        <div class="results" id="results">
+            <h2>Your Fixed Deposit Reality Check</h2>
+            
+            <div class="result-row">
+                <div class="result-label">Principal Amount</div>
+                <div id="result-principal">₹500,000</div>
+            </div>
+            
+            <div class="result-row">
+                <div class="result-label">Maturity Amount (Before Tax)</div>
+                <div id="result-maturity">₹538,720</div>
+            </div>
+            
+            <div class="result-row">
+                <div class="result-label">Interest Earned</div>
+                <div id="result-interest">₹38,720</div>
+            </div>
+            
+            <div class="result-row">
+                <div class="result-label">Tax Paid (TDS)</div>
+                <div id="result-tax">₹3,872</div>
+            </div>
+            
+            <div class="result-row">
+                <div class="result-label">Net Interest After Tax</div>
+                <div id="result-net-interest">₹34,848</div>
+            </div>
+            
+            <div class="result-row">
+                <div class="result-label">Advertised Interest Rate</div>
+                <div id="result-advertised-rate">7.50%</div>
+            </div>
+            
+            <div class="result-row">
+                <div class="result-label">Effective Interest Rate After Compounding</div>
+                <div id="result-effective-rate">7.74%</div>
+            </div>
+            
+            <div class="result-row">
+                <div class="result-label">Post-Tax Interest Rate</div>
+                <div id="result-post-tax-rate">6.97%</div>
+            </div>
+            
+            <div class="result-row">
+                <div class="result-label">Inflation Rate</div>
+                <div id="result-inflation-rate">5.20%</div>
+            </div>
+            
+            <div class="result-row">
+                <div class="result-label highlight">Real Return After Inflation & Tax</div>
+                <div id="result-real-return" class="highlight">1.68%</div>
+            </div>
+            
+            <div class="chart-container">
+                <div id="chart" style="height: 300px; position: relative;">
+                    <div class="bar bar-1" style="height: 0%;">
+                        <div class="bar-value">0%</div>
+                        <div class="bar-label">Advertised<br>Rate</div>
+                    </div>
+                    <div class="bar bar-2" style="height: 0%;">
+                        <div class="bar-value">0%</div>
+                        <div class="bar-label">Effective<br>Rate</div>
+                    </div>
+                    <div class="bar bar-3" style="height: 0%;">
+                        <div class="bar-value">0%</div>
+                        <div class="bar-label">Post-Tax<br>Rate</div>
+                    </div>
+                    <div class="bar bar-4" style="height: 0%;">
+                        <div class="bar-value">0%</div>
+                        <div class="bar-label">Real<br>Return</div>
+                    </div>
+                    <div class="chart-base"></div>
+                </div>
+            </div>
+            
+            <div class="analysis">
+                <h3>What This Means For You:</h3>
+                <p>While the bank advertises a <span id="analysis-adv-rate">7.5%</span> interest rate on your fixed deposit, your actual wealth growth after accounting for inflation and taxes is only <span id="analysis-real-return" class="highlight">1.68%</span> per year.</p>
+                
+                <p class="inflation-explainer">Inflation erodes the purchasing power of your money over time. What costs ₹100 today will cost ₹<span id="inflation-future-value">105.20</span> in a year at <span id="inflation-rate-display">5.2%</span> inflation.</p>
+                
+                <div class="impact-statement">In real terms, a ₹<span id="impact-principal">500,000</span> deposit will only grow by ₹<span id="impact-real-growth">8,400</span> in purchasing power over <span id="impact-years">1</span> year despite the bank paying you ₹<span id="impact-interest">38,720</span> in interest.</div>
+                
+                <div class="compounding-info">
+                    <strong>Compounding Effect:</strong> Your FD compounds <span id="compounding-frequency">quarterly</span>, which increases your returns slightly, but still doesn't compensate for the combination of inflation and taxes.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('calculate').addEventListener('click', function() {
+            calculateReturns();
+        });
+
+        function calculateReturns() {
+            // Get input values
+            const principal = parseFloat(document.getElementById('principal').value);
+            const interestRate = parseFloat(document.getElementById('interestRate').value) / 100;
+            const duration = parseInt(document.getElementById('duration').value);
+            const compoundingFreq = parseInt(document.getElementById('compounding').value);
+            const inflationRate = parseFloat(document.getElementById('inflation').value) / 100;
+            const taxRate = parseFloat(document.getElementById('taxRate').value) / 100;
+            
+            // Calculate maturity amount with compounding
+            const maturityAmount = principal * Math.pow(1 + (interestRate / compoundingFreq), compoundingFreq * duration);
+            const interestEarned = maturityAmount - principal;
+            
+            // Calculate effective annual rate
+            const effectiveRate = Math.pow(1 + (interestRate / compoundingFreq), compoundingFreq) - 1;
+            
+            // Calculate tax
+            const taxPaid = interestEarned * taxRate;
+            const netInterest = interestEarned - taxPaid;
+            
+            // Calculate post-tax rate
+            const postTaxRate = netInterest / principal;
+            
+            // Calculate real return (adjusted for inflation)
+            const realReturn = (1 + postTaxRate) / (1 + inflationRate) - 1;
+            
+            // Display results
+            document.getElementById('result-principal').textContent = '₹' + formatNumber(principal);
+            document.getElementById('result-maturity').textContent = '₹' + formatNumber(maturityAmount);
+            document.getElementById('result-interest').textContent = '₹' + formatNumber(interestEarned);
+            document.getElementById('result-tax').textContent = '₹' + formatNumber(taxPaid);
+            document.getElementById('result-net-interest').textContent = '₹' + formatNumber(netInterest);
+            document.getElementById('result-advertised-rate').textContent = (interestRate * 100).toFixed(2) + '%';
+            document.getElementById('result-effective-rate').textContent = (effectiveRate * 100).toFixed(2) + '%';
+            document.getElementById('result-post-tax-rate').textContent = (postTaxRate * 100).toFixed(2) + '%';
+            document.getElementById('result-inflation-rate').textContent = (inflationRate * 100).toFixed(2) + '%';
+            document.getElementById('result-real-return').textContent = (realReturn * 100).toFixed(2) + '%';
+            
+            // Update chart
+            updateChart(interestRate * 100, effectiveRate * 100, postTaxRate * 100, realReturn * 100);
+            
+            // Update analysis text
+            document.getElementById('analysis-adv-rate').textContent = (interestRate * 100).toFixed(2) + '%';
+            document.getElementById('analysis-real-return').textContent = (realReturn * 100).toFixed(2) + '%';
+            document.getElementById('inflation-future-value').textContent = (100 * (1 + inflationRate)).toFixed(2);
+            document.getElementById('inflation-rate-display').textContent = (inflationRate * 100).toFixed(2) + '%';
+            document.getElementById('impact-principal').textContent = formatNumber(principal);
+            document.getElementById('impact-real-growth').textContent = formatNumber(principal * realReturn);
+            document.getElementById('impact-years').textContent = duration;
+            document.getElementById('impact-interest').textContent = formatNumber(interestEarned);
+            
+            // Update compounding info
+            const compoundingText = {
+                1: 'annually',
+                2: 'semi-annually',
+                4: 'quarterly',
+                12: 'monthly'
+            };
+            document.getElementById('compounding-frequency').textContent = compoundingText[compoundingFreq];
+            
+            // Show results
+            document.getElementById('results').style.display = 'block';
+        }
+        
+        function updateChart(advertised, effective, postTax, real) {
+            // Set maximum scale to be slightly higher than the highest value
+            const maxValue = Math.max(advertised, effective, postTax, real);
+            const scale = maxValue * 1.2;
+            
+            // Update bar heights and values
+            updateBar('bar-1', advertised, scale);
+            updateBar('bar-2', effective, scale);
+            updateBar('bar-3', postTax, scale);
+            updateBar('bar-4', real, scale);
+        }
+        
+        function updateBar(barClass, value, scale) {
+            const percentage = (value / scale) * 100;
+            const bar = document.querySelector('.' + barClass);
+            setTimeout(() => {
+                bar.style.height = percentage + '%';
+                bar.querySelector('.bar-value').textContent = value.toFixed(2) + '%';
+            }, 100); // Small delay for animation effect
+        }
+        
+        function formatNumber(number) {
+            return number.toLocaleString('en-IN', {
+                maximumFractionDigits: 2,
+                minimumFractionDigits: 2
+            });
+        }
+        
+        // Initialize with default values
+        window.onload = function() {
+            calculateReturns();
+        };
+    </script>
+</body>
+</html>
