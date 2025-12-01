@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FD Growth Timeline Calculator - Plan Your Investment Journey</title>
+    
+    <!--
+    Date Created: December 01, 2025
+    Tool: Claude Sonnet 4
+    Prompt: Create a Fixed Deposit calculator tool taking capital amount, desired FINAL amount 
+    (after TDS), and FD interest rate as inputs. Calculate time to reach target with quarterly 
+    compounding, working backwards so desired amount equals final received amount after TDS. 
+    Show total days for bank-specific FD schemes. Mobile-first responsive design.
+    
+    README.md:
+    # Fixed Deposit Growth Timeline Calculator
+    
+    ## Purpose
+    A comprehensive FD planning tool for Indian investors that calculates the exact timeline 
+    to reach financial goals through Fixed Deposits. Works backwards from your desired final 
+    amount - ensuring you receive exactly what you want after TDS deduction.
+    
+    ## Key Innovation
+    **Backwards Calculation**: Unlike typical FD calculators, this tool lets you specify 
+    what you want to receive in hand (after TDS), then automatically calculates the gross 
+    target needed before TDS so that after 10% deduction, you get your desired amount.
+    
+    ## Features
+    - Quarterly compounding calculation (standard for Indian banks)
+    - 10% TDS deduction on interest income (as per Indian tax regulations)
+    - **Desired Final Amount = Actual Amount Received** (TDS already accounted for)
+    - Investment date capture and maturity date projection
+    - Time breakdown in years, months, days, AND total days
+    - Total days display helps match bank-specific FD schemes (444-day, 555-day, etc.)
+    - Visual timeline representation
+    - Interest earned vs TDS deducted breakdown
+    - Mobile-first responsive design optimized for smartphones
+    - Input validation with helpful error messages
+    - Professional Indian banking theme with rupee symbols
+    - Clear, unconfusing result presentation
+    
+    ## Calculation Logic
+    - User specifies desired final amount F (what they want to receive)
+    - Calculator determines: Interest needed I = (F - P) / 0.90
+    - Gross target before TDS = P + I
+    - Time calculated using: t = log(GrossTarget/P) / (n * log(1 + r/n))
+    - TDS deducted: 0.10 × I
+    - Final amount received = Gross target - TDS = F ✓
+    
+    ## Why Total Days Matter
+    Banks often offer special rates for specific tenures:
+    - 444 days (Unity SFB, Bank of Baroda special schemes)
+    - 555 days (IDBI Chiranjeevi FD)
+    - 777 days (Bank of India Star Utsav)
+    - 390 days, 400 days (PNB, IDFC special rates)
+    
+    Knowing total days helps you align with these promotional offers for maximum returns.
+    
+    ## Use Cases
+    - Planning FD investments where you need specific corpus at maturity
+    - Calculating timeline for goal-based savings (wedding, education, down payment)
+    - Tax planning with accurate TDS projections
+    - Matching investment duration with bank special FD schemes
+    - Retirement planning with predictable post-tax income
+    
+    This tool serves as an essential planning companion for anyone using Fixed Deposits 
+    as part of their wealth creation or retirement strategy in India.
+    -->
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary-blue: #1e5fcc;
+            --dark-blue: #0a3d91;
+            --light-blue: #e3f2fd;
+            --accent-gold: #ffc107;
+            --success-green: #28a745;
+            --warning-orange: #ff9800;
+            --danger-red: #dc3545;
+            --text-dark: #2d3748;
+            --text-light: #6c757d;
+            --border-color: #dee2e6;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            color: var(--text-dark);
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 15px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            padding: 25px 15px;
+            animation: fadeIn 0.8s ease-in;
+        }
+        
+        .header h1 {
+            font-size: 1.75rem;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-weight: 700;
+            line-height: 1.3;
+        }
+        
+        .header .subtitle {
+            font-size: 0.95rem;
+            opacity: 0.95;
+            font-weight: 400;
+            margin-bottom: 8px;
+        }
+        
+        .purpose {
+            font-size: 0.85rem;
+            opacity: 0.85;
+            font-style: italic;
+            line-height: 1.4;
+        }
+        
+        .calculator-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px 20px;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 20px;
+            flex: 1;
+        }
+        
+        .section-title {
+            font-size: 1.1rem;
+            color: var(--primary-blue);
+            margin-bottom: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+        
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        
+        .currency-symbol {
+            position: absolute;
+            left: 15px;
+            color: var(--text-light);
+            font-weight: 600;
+            font-size: 1.1rem;
+            pointer-events: none;
+        }
+        
+        .percent-symbol {
+            position: absolute;
+            right: 15px;
+            color: var(--text-light);
+            font-weight: 600;
+            font-size: 1.1rem;
+            pointer-events: none;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 15px 45px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 4px rgba(30, 95, 204, 0.1);
+        }
+        
+        .input-group input::placeholder {
+            color: #adb5bd;
+        }
+        
+        .helper-text {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-top: 5px;
+            font-style: italic;
+        }
+        
+        .date-input-group {
+            margin-bottom: 20px;
+        }
+        
+        .date-input-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+        
+        .date-input-group input[type="date"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        
+        .date-input-group input[type="date"]:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 4px rgba(30, 95, 204, 0.1);
+        }
+        
+        .calculate-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(30, 95, 204, 0.4);
+        }
+        
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+        
+        .results-section {
+            display: none;
+            margin-top: 25px;
+            animation: slideUp 0.5s ease-out;
+        }
+        
+        .results-section.show {
+            display: block;
+        }
+        
+        .timeline-card {
+            background: linear-gradient(135deg, var(--light-blue), #ffffff);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid var(--primary-blue);
+        }
+        
+        .timeline-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .timeline-duration {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+        
+        .timeline-subtitle {
+            font-size: 0.95rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+        
+        .date-range {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+        
+        .date-item {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .date-label {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+        
+        .date-value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        
+        .date-arrow {
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            margin: 0 10px;
+        }
+        
+        .breakdown-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .breakdown-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+        
+        .breakdown-label {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        
+        .breakdown-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        
+        .financial-summary {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .summary-row:last-child {
+            border-bottom: none;
+            padding-top: 15px;
+            margin-top: 8px;
+            border-top: 2px solid var(--primary-blue);
+        }
+        
+        .summary-label {
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+        
+        .summary-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        
+        .summary-value.highlight {
+            font-size: 1.3rem;
+            color: var(--success-green);
+        }
+        
+        .summary-value.warning {
+            color: var(--danger-red);
+        }
+        
+        .info-box {
+            background: #fff3cd;
+            border-left: 4px solid var(--accent-gold);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: #856404;
+            line-height: 1.5;
+        }
+        
+        .info-box strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid var(--success-green);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #155724;
+            line-height: 1.5;
+        }
+        
+        .footer {
+            text-align: center;
+            color: white;
+            padding: 20px 15px;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .footer strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 1rem;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 400px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .timeline-duration {
+                font-size: 2rem;
+            }
+            
+            .breakdown-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .date-range {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .date-arrow {
+                transform: rotate(90deg);
+                margin: 5px 0;
+            }
+        }
+        
+        /* Error styling */
+        .input-group input.error {
+            border-color: var(--danger-red);
+        }
+        
+        .error-message {
+            color: var(--danger-red);
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 FD Growth Timeline Calculator</h1>
+            <p class="subtitle">Plan Your Fixed Deposit Investment Journey</p>
+            <p class="purpose">Enter the final amount you want to receive (after TDS) and discover exactly when your FD will reach that goal with quarterly compounding</p>
+        </div>
+
+        <div class="calculator-card">
+            <h2 class="section-title">📊 Investment Details</h2>
+            
+            <div class="input-group">
+                <label for="principal">Initial Capital Amount</label>
+                <div class="input-wrapper">
+                    <span class="currency-symbol">₹</span>
+                    <input type="number" id="principal" placeholder="100000" min="1000" step="1000">
+                </div>
+                <p class="helper-text">Amount you want to invest in Fixed Deposit</p>
+                <p class="error-message" id="principalError">Please enter a valid amount (minimum ₹1,000)</p>
+            </div>
+
+            <div class="input-group">
+                <label for="target">Desired Final Amount (After TDS)</label>
+                <div class="input-wrapper">
+                    <span class="currency-symbol">₹</span>
+                    <input type="number" id="target" placeholder="200000" min="1000" step="1000">
+                </div>
+                <p class="helper-text">Final amount you want to receive in hand after TDS deduction</p>
+                <p class="error-message" id="targetError">Final amount must be greater than initial capital</p>
+            </div>
+
+            <div class="input-group">
+                <label for="interestRate">Bank FD Interest Rate</label>
+                <div class="input-wrapper">
+                    <input type="number" id="interestRate" placeholder="7.5" min="1" max="15" step="0.1" style="padding-right: 45px; padding-left: 15px;">
+                    <span class="percent-symbol">% p.a.</span>
+                </div>
+                <p class="helper-text">Annual interest rate offered by your bank</p>
+                <p class="error-message" id="rateError">Please enter a valid rate (1-15%)</p>
+            </div>
+
+            <div class="date-input-group">
+                <label for="investmentDate">Investment Start Date</label>
+                <input type="date" id="investmentDate">
+                <p class="helper-text">Date when you plan to invest</p>
+            </div>
+
+            <button class="calculate-btn" onclick="calculateFD()">
+                🚀 Calculate Timeline
+            </button>
+
+            <div class="results-section" id="results">
+                <!-- Timeline Card -->
+                <div class="timeline-card">
+                    <div class="timeline-header">
+                        <div class="timeline-duration" id="duration">-</div>
+                        <div class="timeline-subtitle">Time to reach your target</div>
+                        <div style="font-size: 1.1rem; color: var(--primary-blue); font-weight: 600; margin-top: 8px;" id="totalDays">-</div>
+                        
+                        <!-- Maturity Date Highlight -->
+                        <div style="margin-top: 15px; padding: 12px; background: rgba(40, 167, 69, 0.1); border-radius: 8px; border-left: 4px solid var(--success-green);">
+                            <div style="font-size: 0.8rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">
+                                🎯 Maturity Date
+                            </div>
+                            <div style="font-size: 1.3rem; font-weight: 700; color: var(--success-green);" id="maturityDateHighlight">
+                                -
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="date-range">
+                        <div class="date-item">
+                            <div class="date-label">Start Date</div>
+                            <div class="date-value" id="startDate">-</div>
+                        </div>
+                        <div class="date-arrow">→</div>
+                        <div class="date-item">
+                            <div class="date-label">Maturity Date</div>
+                            <div class="date-value" id="maturityDate">-</div>
+                        </div>
+                    </div>
+
+                    <div class="breakdown-grid">
+                        <div class="breakdown-item">
+                            <div class="breakdown-label">Years</div>
+                            <div class="breakdown-value" id="years">-</div>
+                        </div>
+                        <div class="breakdown-item">
+                            <div class="breakdown-label">Months</div>
+                            <div class="breakdown-value" id="months">-</div>
+                        </div>
+                        <div class="breakdown-item">
+                            <div class="breakdown-label">Days</div>
+                            <div class="breakdown-value" id="days">-</div>
+                        </div>
+                        <div class="breakdown-item">
+                            <div class="breakdown-label">Quarters</div>
+                            <div class="breakdown-value" id="quarters">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Financial Summary -->
+                <div class="financial-summary">
+                    <h3 class="section-title">💵 Financial Breakdown</h3>
+                    
+                    <div class="summary-row">
+                        <span class="summary-label">Initial Investment</span>
+                        <span class="summary-value" id="investedAmount">₹0</span>
+                    </div>
+                    
+                    <div class="summary-row">
+                        <span class="summary-label">Gross Target (Before TDS)</span>
+                        <span class="summary-value" id="targetAmount">₹0</span>
+                    </div>
+                    
+                    <div class="summary-row">
+                        <span class="summary-label">Interest Earned</span>
+                        <span class="summary-value" style="color: var(--success-green)" id="interestEarned">₹0</span>
+                    </div>
+                    
+                    <div class="summary-row">
+                        <span class="summary-label">TDS Deducted (10%)</span>
+                        <span class="summary-value warning" id="tdsAmount">₹0</span>
+                    </div>
+                    
+                    <div class="summary-row">
+                        <span class="summary-label">Final Amount (After TDS) ✓</span>
+                        <span class="summary-value highlight" id="finalAmount">₹0</span>
+                    </div>
+                    
+                    <div style="text-align: center; padding: 10px; background: #e8f5e9; border-radius: 8px; margin-top: 10px;">
+                        <small style="color: #2e7d32; font-weight: 600;">
+                            ✓ This matches your desired final amount exactly!
+                        </small>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <strong>📌 How This Calculator Works:</strong>
+                    • You enter the <strong>final amount you want to receive</strong> (after TDS)<br>
+                    • Calculator determines the gross target needed before TDS deduction<br>
+                    • Uses quarterly compounding (standard for Indian banks)<br>
+                    • 10% TDS is deducted on interest earned<br>
+                    • <strong>Your desired final amount = What you actually receive!</strong><br>
+                    • Total days shown help you match bank-specific FD schemes (e.g., 444-day, 555-day offers)
+                </div>
+
+                <div class="success-box" id="successMessage">
+                    ✅ Perfect! Your desired final amount of <span id="confirmedAmount" style="font-weight: 700;"></span> will be achieved after TDS deduction. The calculator has determined the gross target needed before TDS to ensure you receive exactly what you want!
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <strong>Created by Roger</strong>
+            <p>Empowering smart investment decisions through transparent calculations</p>
+        </div>
+    </div>
+
+    <script>
+        // Set today's date as default
+        document.getElementById('investmentDate').valueAsDate = new Date();
+
+        function validateInputs() {
+            let isValid = true;
+            
+            const principal = parseFloat(document.getElementById('principal').value);
+            const target = parseFloat(document.getElementById('target').value);
+            const rate = parseFloat(document.getElementById('interestRate').value);
+            
+            // Reset error states
+            document.querySelectorAll('.error-message').forEach(el => el.classList.remove('show'));
+            document.querySelectorAll('input').forEach(el => el.classList.remove('error'));
+            
+            // Validate principal
+            if (!principal || principal < 1000) {
+                document.getElementById('principalError').classList.add('show');
+                document.getElementById('principal').classList.add('error');
+                isValid = false;
+            }
+            
+            // Validate target
+            if (!target || target <= principal) {
+                document.getElementById('targetError').classList.add('show');
+                document.getElementById('target').classList.add('error');
+                isValid = false;
+            }
+            
+            // Validate rate
+            if (!rate || rate < 1 || rate > 15) {
+                document.getElementById('rateError').classList.add('show');
+                document.getElementById('interestRate').classList.add('error');
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+
+        function calculateFD() {
+            // Validate inputs first
+            if (!validateInputs()) {
+                return;
+            }
+
+            const principal = parseFloat(document.getElementById('principal').value);
+            const desiredFinalAmount = parseFloat(document.getElementById('target').value);
+            const annualRate = parseFloat(document.getElementById('interestRate').value);
+            const investmentDate = new Date(document.getElementById('investmentDate').value);
+            
+            // Work backwards from desired final amount
+            // If user wants F as final amount after TDS:
+            // F = P + I - (0.10 × I) = P + 0.90 × I
+            // So: I = (F - P) / 0.90
+            // Gross Target = P + I
+            
+            const interestNeeded = (desiredFinalAmount - principal) / 0.90;
+            const grossTarget = principal + interestNeeded;
+            
+            // Quarterly compounding parameters
+            const n = 4; // Compounding frequency (quarterly)
+            const r = annualRate / 100; // Convert percentage to decimal
+            
+            // Calculate time using compound interest formula
+            // A = P(1 + r/n)^(nt)
+            // Solving for t: t = log(A/P) / (n * log(1 + r/n))
+            const timeInYears = Math.log(grossTarget / principal) / (n * Math.log(1 + r / n));
+            
+            // Calculate total days
+            const totalDays = Math.round(timeInYears * 365);
+            
+            // Break down time into years, months, days
+            const years = Math.floor(timeInYears);
+            const remainingMonths = (timeInYears - years) * 12;
+            const months = Math.floor(remainingMonths);
+            const days = Math.floor((remainingMonths - months) * 30);
+            const totalQuarters = Math.ceil(timeInYears * 4);
+            
+            // Calculate maturity date
+            const maturityDate = new Date(investmentDate);
+            maturityDate.setFullYear(maturityDate.getFullYear() + years);
+            maturityDate.setMonth(maturityDate.getMonth() + months);
+            maturityDate.setDate(maturityDate.getDate() + days);
+            
+            // Calculate TDS
+            const tdsRate = 0.10; // 10% TDS
+            const tdsAmount = interestNeeded * tdsRate;
+            const finalAmount = grossTarget - tdsAmount; // Should equal desiredFinalAmount
+            
+            // Format dates
+            const options = { day: '2-digit', month: 'short', year: 'numeric' };
+            const startDateFormatted = investmentDate.toLocaleDateString('en-IN', options);
+            const maturityDateFormatted = maturityDate.toLocaleDateString('en-IN', options);
+            
+            // Display results
+            document.getElementById('duration').textContent = 
+                years > 0 ? `${years}y ${months}m ${days}d` : 
+                months > 0 ? `${months}m ${days}d` : 
+                `${days} days`;
+            
+            document.getElementById('totalDays').textContent = `Total: ${totalDays} days`;
+            
+            document.getElementById('startDate').textContent = startDateFormatted;
+            document.getElementById('maturityDate').textContent = maturityDateFormatted;
+            document.getElementById('maturityDateHighlight').textContent = maturityDateFormatted;
+            
+            document.getElementById('years').textContent = years;
+            document.getElementById('months').textContent = months;
+            document.getElementById('days').textContent = days;
+            document.getElementById('quarters').textContent = totalQuarters;
+            
+            document.getElementById('investedAmount').textContent = formatCurrency(principal);
+            document.getElementById('targetAmount').textContent = formatCurrency(grossTarget);
+            document.getElementById('interestEarned').textContent = formatCurrency(interestNeeded);
+            document.getElementById('tdsAmount').textContent = formatCurrency(tdsAmount);
+            document.getElementById('finalAmount').textContent = formatCurrency(finalAmount);
+            
+            // Update success message with confirmed amount
+            document.getElementById('confirmedAmount').textContent = formatCurrency(desiredFinalAmount);
+            
+            // Show results with animation
+            const resultsSection = document.getElementById('results');
+            resultsSection.classList.add('show');
+            
+            // Scroll to results smoothly
+            setTimeout(() => {
+                resultsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+
+        function formatCurrency(amount) {
+            return '₹' + amount.toLocaleString('en-IN', { 
+                maximumFractionDigits: 0,
+                minimumFractionDigits: 0
+            });
+        }
+
+        // Allow Enter key to calculate
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    calculateFD();
+                }
+            });
+        });
+
+        // Clear error on input change
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            input.addEventListener('input', function() {
+                this.classList.remove('error');
+                const errorId = this.id + 'Error';
+                const errorElement = document.getElementById(errorId);
+                if (errorElement) {
+                    errorElement.classList.remove('show');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
